@@ -5,9 +5,9 @@ WeiXin-Private-API
 
 本接口参考https://github.com/zscorpio/weChat, 在此基础上作了修改和完善.
 
-用法参考test.php:
+使用:
 
-先在conifg.php中配置公共账号信息:
+1. 先在conifg.php中配置公共账号信息:
 <pre>
 	$G_CONFIG["weiXin"] = array(
 		'account' => '公共平台账号',
@@ -16,6 +16,8 @@ WeiXin-Private-API
 		'webTokenPath' => $G_ROOT. '/cache/webToken',
 	);	
 </pre>
+
+2. test.php:
 
 <pre>
 	require "config.php";
