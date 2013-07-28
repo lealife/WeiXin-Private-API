@@ -1,2 +1,2 @@
 config.php
-cache/*
+/cache/*
