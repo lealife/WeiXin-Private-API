@@ -8,16 +8,17 @@ WeiXin-Private-API
 使用:
 
 1. 先在conifg.php中配置公共账号信息:
-<pre>
+```php
 	$G_CONFIG["weiXin"] = array(
 		'account' => '公共平台账号',
 		'password' => '密码',
 		'cookiePath' => $G_ROOT. '/cache/cookie', // cookie缓存文件路径
 		'webTokenPath' => $G_ROOT. '/cache/webToken', // webToken缓存文件路径
 	);
-</pre>
+```
+
 2. test.php:
-<pre>
+```php
 	require "config.php";
 	require "include/WeiXin.php";
 
@@ -36,4 +37,4 @@ WeiXin-Private-API
 
 	// 得到最新消息
 	print_r($weiXin->getLatestMsgs());
-</pre>
+```
