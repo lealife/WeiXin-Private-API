@@ -3,21 +3,21 @@ WeiXin-Private-API
 
 微信公用平台私有接口, 发送信息, 发送图片, 得到用户信息, 解析用户fakeId
 
-本接口参考weChat:[https://github.com/zscorpio/weChat], 在此基础上作了修改和完善.
+本接口参考[weChat](https://github.com/zscorpio/weChat), 在此基础上作了修改和完善.
 
 使用:
 
 1. 先在conifg.php中配置公共账号信息:
-
+<pre>
 	$G_CONFIG["weiXin"] = array(
 		'account' => '公共平台账号',
 		'password' => '密码',
 		'cookiePath' => $G_ROOT. '/cache/cookie', // cookie缓存文件路径
 		'webTokenPath' => $G_ROOT. '/cache/webToken', // webToken缓存文件路径
 	);
-
+</pre>
 2. test.php:
-	<?php
+<pre>
 	require "config.php";
 	require "include/WeiXin.php";
 
@@ -36,3 +36,4 @@ WeiXin-Private-API
 
 	// 得到最新消息
 	print_r($weiXin->getLatestMsgs());
+</pre>
