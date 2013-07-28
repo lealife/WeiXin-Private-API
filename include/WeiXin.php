@@ -173,6 +173,31 @@ class WeiXin
 	}	
 
 	/**
+	 * 发送图片
+	 * @param  int $fakeId [description]
+	 * @param  int $fileId 图片ID
+	 * @return [type]         [description]
+	 */
+	public function sendImage($fakeId, $fileId) {
+		$send_snoopy = new Snoopy; 
+		$post = array();
+		$post['tofakeid'] = $fakeId;
+		$post['type'] = 2;
+		$post['fid'] = $post['fileId'] = $fileId; // 图片ID
+		$post['error'] = false;
+		$post['ajax'] = 1;
+		$post['token'] = $this->webToken;
+
+        $send_snoopy->referer = "http://mp.weixin.qq.com/cgi-bin/singlemsgpage?fromfakeid={$fakeId}&msgid=&source=&count=20&t=wxm-singlechat&lang=zh_cn&token={$this->webtoken}";
+		$send_snoopy->rawheaders['Cookie']= $this->cookie;
+		$submit = "http://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&lang=zh_CN";
+		$send_snoopy->submit($submit, $post);
+
+		// {"ret":"0", "msg":"ok"}
+		return json_decode($send_snoopy->results);
+	}
+
+	/**
 	 * 获取用户的信息
 	 * @param  string $fakeId 用户的fakeId
 	 * @return [type]     [description]
