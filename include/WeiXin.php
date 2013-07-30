@@ -146,28 +146,16 @@ class WeiXin
 	}
 
 	/**
-	 * 批量发送(可能需要设置超时)
-	 * @param  [type] $ids     用户的fakeid集合,逗号分割
+	 * 批量发送
+	 * @param  [array] $ids     用户的fakeid集合
 	 * @param  [type] $content [description]
 	 * @return [type]          [description]
 	 */
-	public function batSend($ids,$content)
+	public function batSend($ids, $content)
 	{
-		$ids_array = explode(",", $ids);
 		$result = array();
-		foreach ($ids_array as $key => $value) {
-			$send_snoopy = new Snoopy; 
-			$post = array();
-			$post['type'] = 1;
-			$post['content'] = $content;
-			$post['ajax'] = 1;
-            $send_snoopy->referer = "http://mp.weixin.qq.com/cgi-bin/singlemsgpage?fromfakeid={$value}&msgid=&source=&count=20&t=wxm-singlechat&lang=zh_CN&token={$this->webToken}";
-			$send_snoopy->rawheaders['Cookie']= $this->cookie;
-			$submit = "http://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&token={$this->webToken}";
-			$post['tofakeid'] = $value;
-			$send_snoopy->submit($submit,$post);
-			$tmp = $send_snoopy->results;
-			array_push($result, $tmp);
+		foreach($ids as $id) {
+			$result[$id] = $this->send($id, $content);
 		}
 		return $result;
 	}	
