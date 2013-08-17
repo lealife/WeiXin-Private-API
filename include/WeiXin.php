@@ -1,5 +1,5 @@
 <?php
-require($G_ROOT. "/include/Snoopy.php");
+require($G_ROOT. "/include/LeaWeiXinClient.php");
 
 /**
  * 微信公共平台的私有接口
@@ -27,6 +27,8 @@ class WeiXin
 	private $webToken; // 登录后每个链接后都要加token
 	private $cookie;
 
+	private $lea;
+
 	// 构造函数
 	public function __construct($config) {
 		if(!$config) {
@@ -39,6 +41,8 @@ class WeiXin
 		$this->cookiePath = $config['cookiePath'];
 		$this->webTokenPath = $config['webTokenPath'];
 
+		$this->lea = new LeaWeiXinClient();
+
 		// 读取cookie, webToken
 		$this->getCookieAndWebToken();
 	}
@@ -49,30 +53,18 @@ class WeiXin
 	 * 模拟登录获取cookie和webToken
 	 */
 	public function login() {
-		$snoopy = new Snoopy; 
-		$submit = "http://mp.weixin.qq.com/cgi-bin/login?lang=zh_CN";
+		$url = "https://mp.weixin.qq.com/cgi-bin/login?lang=zh_CN";
 		$post["username"] = $this->account;
 		$post["pwd"] = md5($this->password);
 		$post["f"] = "json";
-		$snoopy->submit($submit, $post);
-
-		// 得到cookie 
-		$cookie = '';
-		foreach($snoopy->headers as $key => $value) {
-			$value = trim($value);
-			if(strpos($value,'Set-Cookie: ') || strpos($value,'Set-Cookie: ') === 0) {
-				$tmp = str_replace("Set-Cookie: ", "", $value);
-				$tmp = str_replace("Path=/", "", $tmp);
-				$cookie .= $tmp. ";"; // 加";" httpOnly
-			}
-		}
+		$re = $this->lea->submit($url, $post);
 
 		// 保存cookie
-		$this->cookie = $cookie;
-		file_put_contents($this->cookiePath, $cookie);
+		$this->cookie = $re['cookie'];
+		file_put_contents($this->cookiePath, $this->cookie);
 
 		// 得到token
-		$this->getWebToken($snoopy->results);
+		$this->getWebToken($re['body']);
 
 		return true;
 	}
@@ -105,11 +97,9 @@ class WeiXin
 
 		// 如果有缓存信息, 则验证下有没有过时, 此时只需要访问一个api即可判断
 		if($this->cookie && $this->webToken) {
-			$send_snoopy = new Snoopy;
-			$send_snoopy->rawheaders['Cookie'] = $this->cookie;
-			$submit = "http://mp.weixin.qq.com/cgi-bin/getcontactinfo?t=ajax-getcontactinfo&lang=zh_CN&token={$this->webToken}&fakeid=";
-			$send_snoopy->submit($submit, array());
-			$result = json_decode($send_snoopy->results, 1);
+			$url = "https://mp.weixin.qq.com/cgi-bin/getcontactinfo?t=ajax-getcontactinfo&lang=zh_CN&token={$this->webToken}&fakeid=";
+			$re = $this->lea->submit($submit, array(), $this->cookie);
+			$result = json_decode($re['body'], 1);
 
 			if(!$result) {
 				return $this->login();
@@ -131,18 +121,14 @@ class WeiXin
 	 */
 	public function send($id, $content)
 	{
-		$send_snoopy = new Snoopy; 
 		$post = array();
 		$post['tofakeid'] = $id;
 		$post['type'] = 1;
 		$post['content'] = $content;
 		$post['ajax'] = 1;
-        $send_snoopy->referer = "http://mp.weixin.qq.com/cgi-bin/singlemsgpage?fromfakeid={$id}&msgid=&source=&count=20&t=wxm-singlechat&lang=zh_CN&token={$this->webToken}";
-		$send_snoopy->rawheaders['Cookie']= $this->cookie;
-		$submit = "http://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&token={$this->webToken}";
-		$send_snoopy->submit($submit, $post);
-		// {"ret":"0", "msg":"ok"}
-		return json_decode($send_snoopy->results);
+		$url = "https://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&token={$this->webToken}";
+		$re = $this->lea->submit($url, $post, $this->cookie);
+		return json_decode($re['body']);
 	}
 
 	/**
@@ -167,7 +153,6 @@ class WeiXin
 	 * @return [type]         [description]
 	 */
 	public function sendImage($fakeId, $fileId) {
-		$send_snoopy = new Snoopy; 
 		$post = array();
 		$post['tofakeid'] = $fakeId;
 		$post['type'] = 2;
@@ -176,13 +161,10 @@ class WeiXin
 		$post['ajax'] = 1;
 		$post['token'] = $this->webToken;
 
-        $send_snoopy->referer = "http://mp.weixin.qq.com/cgi-bin/singlemsgpage?fromfakeid={$fakeId}&msgid=&source=&count=20&t=wxm-singlechat&lang=zh_cn&token={$this->webtoken}";
-		$send_snoopy->rawheaders['Cookie']= $this->cookie;
-		$submit = "http://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&lang=zh_CN";
-		$send_snoopy->submit($submit, $post);
+		$url = "https://mp.weixin.qq.com/cgi-bin/singlesend?t=ajax-response&lang=zh_CN";
+		$re = $this->lea->submit($url, $post, $this->cookie);
 
-		// {"ret":"0", "msg":"ok"}
-		return json_decode($send_snoopy->results);
+		return json_decode($re['body']);
 	}
 
 	/**
@@ -192,11 +174,9 @@ class WeiXin
 	 */
 	public function getUserInfo($fakeId)
 	{
-		$send_snoopy = new Snoopy; 
-		$send_snoopy->rawheaders['Cookie']= $this->cookie;
-		$submit = "http://mp.weixin.qq.com/cgi-bin/getcontactinfo?t=ajax-getcontactinfo&lang=zh_CN&token={$this->webToken}&fakeid=$fakeId";
-		$send_snoopy->submit($submit, array());
-		$result = json_decode($send_snoopy->results, 1);
+		$url = "https://mp.weixin.qq.com/cgi-bin/getcontactinfo?t=ajax-getcontactinfo&lang=zh_CN&token={$this->webToken}&fakeid=$fakeId";
+		$re = $this->lea->submit($url, array(), $this->cookie);
+		$result = json_decode($re['body'], 1);
 		if(!$result) {
 			$this->login();
 		}
@@ -219,17 +199,12 @@ class WeiXin
         [ok]
 	 */
 	public function getLatestMsgs($page = 0) {
-		$send_snoopy = new Snoopy; 
 		// frommsgid是最新一条的msgid
 		$frommsgid = 100000;
 		$offset = 50 * $page;
-		$submit = "http://mp.weixin.qq.com/cgi-bin/getmessage?t=ajax-message&lang=zh_CN&count=50&timeline=&day=&star=&frommsgid=$frommsgid&cgi=getmessage&offset=$offset";
-		$send_snoopy->rawheaders['Cookie'] = $this->cookie;
-		$send_snoopy->submit($submit, array("token" => $this->webToken, "ajax" => 1));
-		$result = $send_snoopy->results;
-		$result = json_decode($result, 1);
-
-		return $result;
+		$url = "https://mp.weixin.qq.com/cgi-bin/getmessage?t=ajax-message&lang=zh_CN&count=50&timeline=&day=&star=&frommsgid=$frommsgid&cgi=getmessage&offset=$offset";
+		$re = $this->lea->submit($url, array("token" => $this->webToken, "ajax" => 1), $this->cookie);
+		return json_decode($re['body'], 1);
 	}
 
 	// 解析用户信息
