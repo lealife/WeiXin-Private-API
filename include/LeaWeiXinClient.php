@@ -26,7 +26,9 @@ class LeaWeiXinClient {
         curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         // curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Referer:https://mp.weixin.qq.com/"));
+        $refer = "https://mp.weixin.qq.com/cgi-bin/singlemsgpage";
+        $oldReferer = "https://mp.weixin.qq.com/";
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Referer:$refer"));
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
         curl_setopt($curl, CURLOPT_POSTFIELDS, $dataStr); // Post提交的数据包
         curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
