@@ -1,7 +1,7 @@
 WeiXin-Private-API
 ==================
 
-微信公用平台私有接口, 发送信息, 发送图片, 得到用户信息, 解析用户fakeId
+微信公众平台私有接口, 发送信息, 发送图片, 得到用户信息, 解析用户fakeId
 
 本接口参考[weChat](https://github.com/zscorpio/weChat), 在此基础上作了修改和完善.
 
