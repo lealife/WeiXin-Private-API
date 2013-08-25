@@ -3,6 +3,13 @@
  * 发送curl请求
  */
 class LeaWeiXinClient {
+    function submit($url, $data, $cookie = false) {
+        return $this->exec($url, $data, $cookie);
+    }
+
+    function get($url, $cookie) {
+        return $this->exec($url, false, $cookie, false);
+    }
 
     /**
      * 返回array(cookie=>, body=>)
@@ -11,7 +18,7 @@ class LeaWeiXinClient {
      * @param  [type] $cookie [description]
      * @return [type]         [description]
      */
-    function submit($url, $data, $cookie = false) {
+    private function exec($url, $data, $cookie = false, $isPost = true) {
         $dataStr = "";
         if($data && is_array($data)) {
             foreach($data as $key => $value) {
@@ -29,8 +36,12 @@ class LeaWeiXinClient {
         $referer = "https://mp.weixin.qq.com/cgi-bin/singlemsgpage";
         $oldReferer = "https://mp.weixin.qq.com/";
         curl_setopt($curl, CURLOPT_HTTPHEADER, array("Referer:$referer"));
-        curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $dataStr); // Post提交的数据包
+
+        if($isPost) {
+            curl_setopt($curl, CURLOPT_POST, 0); // 发送一个常规的Post请求
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $dataStr); // Post提交的数据包
+        }
+
         curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
         curl_setopt($curl, CURLOPT_HEADER, 1); // 显示返回的Header区域内容
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
@@ -45,7 +56,7 @@ class LeaWeiXinClient {
 
         $tmpInfo = curl_exec($curl); // 执行操作
         if (curl_errno($curl)) {
-           echo 'Errno'.curl_error($curl);//捕抓异常
+           echo 'Errno'. curl_error($curl);//捕抓异常
 
            return;
         }

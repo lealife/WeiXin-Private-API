@@ -97,13 +97,8 @@ class WeiXin
 
 		// 如果有缓存信息, 则验证下有没有过时, 此时只需要访问一个api即可判断
 		if($this->cookie && $this->webToken) {
-			$url = "https://mp.weixin.qq.com/cgi-bin/getcontactinfo?t=ajax-getcontactinfo&lang=zh_CN&token={$this->webToken}&fakeid=";
-			$re = $this->lea->submit($submit, array(), $this->cookie);
-			$result = json_decode($re['body'], 1);
-
-			if(!$result) {
-				return $this->login();
-			} else {
+			$re = $this->getUserInfo(1);
+			if(is_array($re)) {
 				return true;
 			}
 		} else {
@@ -202,9 +197,22 @@ class WeiXin
 		// frommsgid是最新一条的msgid
 		$frommsgid = 100000;
 		$offset = 50 * $page;
-		$url = "https://mp.weixin.qq.com/cgi-bin/getmessage?t=ajax-message&lang=zh_CN&count=50&timeline=&day=&star=&frommsgid=$frommsgid&cgi=getmessage&offset=$offset";
-		$re = $this->lea->submit($url, array("token" => $this->webToken, "ajax" => 1), $this->cookie);
-		return json_decode($re['body'], 1);
+		// $url = "https://mp.weixin.qq.com/cgi-bin/getmessage?t=ajax-message&lang=zh_CN&count=50&timeline=&day=&star=&frommsgid=$frommsgid&cgi=getmessage&offset=$offset";
+		$url = "https://mp.weixin.qq.com/cgi-bin/message?t=message/list&count=999999&day=7&offset={$offset}&token={$this->webToken}&lang=zh_CN";
+		$re = $this->lea->get($url, $this->cookie);
+		// print_r($re['body']);
+
+		// 解析得到数据
+		// list : ({"msg_item":[{"id":}, {}]})
+		$match = array();
+		preg_match('/["\' ]msg_item["\' ]:\[{(.+?)}\]/', $re['body'], $match);
+		if(count($match) != 2) {
+			return "";
+		}
+
+		$match[1] = "[{". $match[1]. "}]";
+
+		return json_decode($match[1], 1);
 	}
 
 	// 解析用户信息
