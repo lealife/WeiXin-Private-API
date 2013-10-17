@@ -7,10 +7,10 @@ WeiXin-Private-API
 
 使用:
 
-1. 先在conifg.php中配置公共账号信息:
+1. 先在conifg.php中配置公众账号信息:
 ```php
 	$G_CONFIG["weiXin"] = array(
-		'account' => '公共平台账号',
+		'account' => '公众平台账号',
 		'password' => '密码',
 		'cookiePath' => $G_ROOT. '/cache/cookie', // cookie缓存文件路径
 		'webTokenPath' => $G_ROOT. '/cache/webToken', // webToken缓存文件路径
