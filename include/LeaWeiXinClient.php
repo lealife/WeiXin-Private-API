@@ -33,8 +33,10 @@ class LeaWeiXinClient {
         curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         // curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
-        $referer = "https://mp.weixin.qq.com/cgi-bin/singlemsgpage";
-        $oldReferer = "https://mp.weixin.qq.com/";
+        // $oldReferer = "https://mp.weixin.qq.com/";
+        // $referer = "https://mp.weixin.qq.com/cgi-bin/singlemsgpage";
+        // 腾讯接口变化2013-10-30
+        $referer = "https://mp.weixin.qq.com/cgi-bin/singlesendpage";
         curl_setopt($curl, CURLOPT_HTTPHEADER, array("Referer:$referer"));
 
         if($isPost) {
