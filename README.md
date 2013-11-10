@@ -5,6 +5,8 @@ WeiXin-Private-API
 
 本接口参考[weChat](https://github.com/zscorpio/weChat), 在此基础上作了修改和完善.
 
+另, 微信公众平台接口改变很频繁, 本程序的修改速度有一定的滞后性, 若有朋友得知接口已变, 烦请告知我, 若能一起维护更好, lifephp@gmail.com, 多谢!
+
 使用:
 
 1. 先在conifg.php中配置公众账号信息:
@@ -41,7 +43,4 @@ WeiXin-Private-API
 	
 	// 得到最新消息
 	print_r($weiXin->getLatestMsgs());
-
 ```
-
-另, 微信公众平台接口改变很频繁, 本程序的修改速度有一定的滞后性, 若有朋友得知接口已变, 烦请告知我, 若能一起维护更好, lifephp@gmail.com, 多谢!
