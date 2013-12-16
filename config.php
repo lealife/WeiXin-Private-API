@@ -1,6 +1,6 @@
 <?php
 
-// 全局配置  
+// 全局配置 
 
 $G_ROOT = dirname(__FILE__);
 
