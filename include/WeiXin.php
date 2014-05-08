@@ -8,7 +8,7 @@ require($G_ROOT. "/include/LeaWeiXinClient.php");
  * 功能: 发送信息, 批量发送(未测试), 得到用户信息, 得到最近信息, 解析用户信息(fakeId)
  *
  * @author life lifephp@gmail.com https://github.com/lealife/WeiXin-Private-API
- * 
+ *
  * 参考了gitHub微信的api: https://github.com/zscorpio/weChat, 在此基础上作了修改和完善
  * 	(该接口经测试不能用, 因为webToken的问题, 还有cookie生成的问题, 本接口已修复这些问题)
  */
@@ -76,7 +76,7 @@ class WeiXin
 	 */
 	private function getWebToken($logonRet) {
 		$logonRet = json_decode($logonRet, true);
-		$msg = $logonRet["ErrMsg"]; // /cgi-bin/indexpage?t=wxm-index&lang=zh_CN&token=1455899896
+		$msg = $logonRet["redirect_url"]; // /cgi-bin/indexpage?t=wxm-index&lang=zh_CN&token=1455899896
 		$msgArr = explode("&token=", $msg);
 		if(count($msgArr) != 2) {
 			return false;
@@ -139,7 +139,7 @@ class WeiXin
 			$result[$id] = $this->send($id, $content);
 		}
 		return $result;
-	}	
+	}
 
 	/**
 	 * 发送图片
@@ -179,7 +179,7 @@ class WeiXin
 	}
 
 	/*
-	 得到最近发来的信息
+	 得到最近发来的信息 有时候有用 有时候无法获取
     [0] => Array
         (
             [id] => 189
@@ -188,7 +188,7 @@ class WeiXin
             [hasReply] => 0
             [fakeId] => 1477341521
             [nickName] => lealife
-            [remarkName] => 
+            [remarkName] =>
             [dateTime] => 1374253963
         )
         [ok]
@@ -198,12 +198,13 @@ class WeiXin
 		$frommsgid = 100000;
 		$offset = 50 * $page;
 		// $url = "https://mp.weixin.qq.com/cgi-bin/getmessage?t=ajax-message&lang=zh_CN&count=50&timeline=&day=&star=&frommsgid=$frommsgid&cgi=getmessage&offset=$offset";
-		$url = "https://mp.weixin.qq.com/cgi-bin/message?t=message/list&count=999999&day=7&offset={$offset}&token={$this->webToken}&lang=zh_CN";
+		// $url = "https://mp.weixin.qq.com/cgi-bin/message?t=message/list&count=999999&day=7&offset={$offset}&token={$this->webToken}&lang=zh_CN";
+		$url = "https://mp.weixin.qq.com/cgi-bin/message?t=message/list&count=20&day=7&token={$this->webToken}&lang=zh_CN";
 		$re = $this->lea->get($url, $this->cookie);
 		// print_r($re['body']);
 
 		// 解析得到数据
-		// list : ({"msg_item":[{"id":}, {}]})
+		//list : ({"msg_item":[{"id":}, {}]})
 		$match = array();
 		preg_match('/["\' ]msg_item["\' ]:\[{(.+?)}\]/', $re['body'], $match);
 		if(count($match) != 2) {
@@ -212,7 +213,7 @@ class WeiXin
 
 		$match[1] = "[{". $match[1]. "}]";
 
-		return json_decode($match[1], 1);
+		return json_decode($match[1], true);
 	}
 
 	// 解析用户信息
@@ -221,7 +222,7 @@ class WeiXin
 	// 2. 将用户发送的信息与web上发送的信息进行对比, 如果内容和时间都正确, 那肯定是该用户
 	// 		实践发现, 时间可能会不对, 相隔1-2s或10多秒也有可能, 此时如果内容相同就断定是该用户
 	// 		如果用户在时间相隔很短的情况况下输入同样的内容很可能会出错, 此时可以这样解决: 提示用户输入一些随机数.
-	
+
 	/**
 	 * 通过时间 和 内容 双重判断用户
 	 * @param  [type] $createTime
@@ -236,9 +237,9 @@ class WeiXin
 		$contentMatchedMsg = array();
 		foreach($lMsgs as $msg) {
 			// 仅仅时间符合
-			if($msg['dateTime'] == $createTime) {
+			if($msg['date_time'] == $createTime) {
 				// 内容+时间都符合
-				if($msg['content'] == $content) { 
+				if($msg['content'] == $content) {
 					return $msg;
 				}
 

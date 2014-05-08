@@ -49,8 +49,8 @@ class LeaWeiXinClient {
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
         // curl_setopt($curl, CURLOPT_COOKIEFILE, 'cookie.txt');
         // curl_setopt($curl, CURLOPT_COOKIEJAR, 'cookie.txt');
-        // curl_setopt($curl, CURLOPT_COOKIEJAR, dirname(__FILE__).'/cookie.txt'); 
-        // curl_setopt($curl, CURLOPT_COOKIEFILE, dirname(__FILE__).'/cookie.txt'); 
+        // curl_setopt($curl, CURLOPT_COOKIEJAR, dirname(__FILE__).'/cookie.txt');
+        // curl_setopt($curl, CURLOPT_COOKIEFILE, dirname(__FILE__).'/cookie.txt');
 
         if($cookie) {
             curl_setopt($curl, CURLOPT_COOKIE, $cookie);
