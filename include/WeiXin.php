@@ -257,4 +257,80 @@ class WeiXin
 
 		return false;
 	}
+
+
+	// 一键智能绑定第三方平台 先开启高级模式 再开始配置URL和token
+
+	/**
+	 * 开启高级模式
+	 * @param  [flag] 1是开启 0是关闭
+	 * @param  [type] $type=2
+	 * @return array
+	 * @author forecho [caizhenghai@gmail.com]
+	 */
+	public function openAdvancedSwitch($flag, $type=2){
+		$url = "https://mp.weixin.qq.com/misc/skeyform?form=advancedswitchform&lang=zh_CN";
+		$post["flag"] = $flag;
+		$post["token"] = $this->webToken;
+		$post["type"] = $type;
+		$post["f"] = "json";
+		$re = $this->lea->submit($url, $post, $this->cookie);
+
+		// print_r($re);
+		return json_decode($re['body'], true);
+	}
+
+
+	/**
+	 * 设置接管高级模式的地址
+	 * @param  [backurl] 开发模式里面的URL
+	 * @param  [token] 开发模式Token
+	 * @return array
+	 * @author forecho [caizhenghai@gmail.com]
+	 */
+	public function setCallbackProfile($backurl, $token){
+		$url = "https://mp.weixin.qq.com/advanced/callbackprofile?t=ajax-response&token={$this->webToken}&lang=zh_CN";
+		$post["callback_token"] = $token;
+		$post["url"] = $backurl;
+		$re = $this->lea->submit($url, $post, $this->cookie);
+
+		// print_r($re);
+		return json_decode($re['body'], true);
+	}
+
+
+	/**
+	 * OAuth2.0网页授权, 此功能只限服务号使用
+	 * @param  [domain] 授权回调页面域名'，注意是不带 'http://' 的
+	 * @return array
+	 * @author forecho [caizhenghai@gmail.com]
+	 */
+	public function changeOAuthDomain($domain){
+		$url = "https://mp.weixin.qq.com/merchant/myservice";
+		$post["domain"] = $domain;
+		$post["token"] = $this->webToken;
+		$post["lang"] = 'zh_CN';
+		$post["random"] = '0.'.time().mt_rand(1111111, 9999999);
+		$post["f"] = "json";
+		$post["ajax"] = 1;
+		$post["action"] = 'set_oauth_domain';
+		$re = $this->lea->submit($url, $post, $this->cookie);
+
+		// print_r($re);
+		return json_decode($re['body'], true);
+	}
+
+
+	/**
+	 * 获取微信基本资料和认证信息appid，appkey 等
+	 * @return array
+	 * @author forecho [caizhenghai@gmail.com]
+	 */
+	public function getWxInfo(){
+		$url = "https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev&token={$this->webToken}&lang=zh_CN&f=json";
+		$re = $this->lea->get($url, $this->cookie);
+
+		// print_r($re);
+		return json_decode($re['body'], true);
+	}
 }
