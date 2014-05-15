@@ -16,7 +16,7 @@ WeiXin-Private-API
 
 使用:
 
-1. 先在conifg.php中配置公众账号信息:
+先在conifg.php中配置公众账号信息:
 ```php
 	$G_CONFIG["weiXin"] = array(
 		'account' => '公众平台账号',
@@ -26,7 +26,7 @@ WeiXin-Private-API
 	);
 ```
 
-2. test.php:
+test.php:
 ```php
 	require "config.php";
 	require "include/WeiXin.php";
