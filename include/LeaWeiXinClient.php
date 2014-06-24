@@ -66,7 +66,7 @@ class LeaWeiXinClient {
         curl_close($curl); // 关闭CURL会话
 
         // 解析HTTP数据流
-        list($header, $body) = explode("\r\n\r\n", $tmpInfo);
+        list($header, $body) = explode("\r\n\r\n", $tmpInfo, 2);
 
         if(!$cookie) {
             // 解析COOKIE
